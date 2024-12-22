@@ -1,0 +1,4 @@
+[
+    {"tiempo": "2023-01-01T00:00:00Z", "nivel_combustible": 75, "distancia_recorrida": 10, "velocidad": 60, "orientacion": 180, "coordenadas": {"lat": 10.0, "lon": -74.0}},
+    {"tiempo": "2023-01-01T00:01:00Z", "nivel_combustible": 70, "distancia_recorrida": 20, "velocidad": 65, "orientacion": 185, "coordenadas": {"lat": 10.1, "lon": -74.1}}
+]
