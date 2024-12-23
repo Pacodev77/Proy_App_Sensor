@@ -1,73 +1,87 @@
-#Creación de App proyecto pacodev77 (Tutor: Jhonatan Rivero)
 
-#Parte I (Pruebas)
 
-''' 
-#Importar archivo JSON
-import json
 
-def cargar_datos_json(archivo):
-    with open(archivo, 'r') as f:
-        datos = json.load(f)
-    return datos
-
-# Ejemplo de uso
-if __name__ == "__main__":
-    archivo_json = "index.json"  # Archivo json (dentro de la carpeta: Proy_App_Sensor)
-    datos = cargar_datos_json(archivo_json)
-    print(datos)  # Esto imprimirá los datos en la consola
-    '''
-
-#Cargar librerias
 import json
 import pandas as pd
+from dash import Dash, dcc, html, Input, Output, callback
+import plotly.graph_objs as go
+import os
+import base64  # Asegúrate de incluir esta línea
+
+# Clase para manejar la carga y validación del archivo JSON
+class CargadorJSON:
+    @staticmethod
+    def cargar_datos_json(archivo):
+        try:
+            with open(archivo, 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return None, "El archivo no se encontró."
+        except json.JSONDecodeError:
+            return None, "El archivo no se pudo decodificar como JSON."
+
+# Clase para el procesamiento de datos
+class ProcesadorDatos:
+    @staticmethod
+    def procesar_datos(datos):
+        df = pd.DataFrame(datos)
+        df['tiempo'] = pd.to_datetime(df['tiempo'])
+        
+        if 'tiempo' not in df.columns or 'velocidad' not in df.columns:
+            return None, "El archivo JSON no contiene las columnas necesarias."
+        
+        return df, None
+
+# Crear la aplicación Dash
+app = Dash(__name__)
+
+app.layout = html.Div([
+    html.H1("Aplicación de Graficación de Datos"),
+    dcc.Upload(
+        id='upload-data',
+        children=html.Button('Cargar Archivo JSON'),
+        multiple=False
+    ),
+    dcc.Graph(id='grafico-datos'),
+    html.Div(id='mensaje')
+])
+
+@callback(
+    Output('grafico-datos', 'figure'),
+    Output('mensaje', 'children'),
+    Input('upload-data', 'contents'),
+)
+def actualizar_grafico(contents):
+    if contents is None:
+        return {}, "Por favor, cargue un archivo JSON."
+
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    
+    with open('temp.json', 'wb') as f:
+        f.write(decoded)
+
+    datos, error = CargadorJSON.cargar_datos_json('temp.json')
+    if error:
+        return {}, error
+
+    df, error = ProcesadorDatos.procesar_datos(datos)
+    if error:
+        return {}, error
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df['tiempo'], y=df['velocidad'], mode='lines+markers', name='Velocidad'))
+    fig.update_layout(title='Velocidad Estimada en el Tiempo',
+                      xaxis_title='Tiempo',
+                      yaxis_title='Velocidad (km/h)',
+                      xaxis_tickformat='%Y-%m-%d %H:%M:%S')
+
+    return fig, ""
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
 
 
-#Parte I (Pruebas)
-
-#Función que recibe los datos y los retorna (archivo JSON)
-def cargar_datos_json(archivo):
-    with open(archivo, 'r') as f:
-        datos = json.load(f)
-    return datos
 
 
-#función que procesa los datos (archivo JSON)
-def procesar_datos(datos):
-    df = pd.DataFrame(datos)
-    df['tiempo'] = pd.to_datetime(df['tiempo'])
-    return df
-
-#Parte II
-
-#Condicional que recibe al archivo JSON
-if __name__ == "__main__":
-    archivo_json = "index.json"
-    datos = cargar_datos_json(archivo_json)
-    df = procesar_datos(datos)
-    print(df)  # La consola imprimirá un DataFrame de Pandas
-
-    import matplotlib.pyplot as plt
-
-
-#Parte III
-
-#Función que grafica los datos del archivo (JSON)
-def graficar_datos(df):
-    plt.figure(figsize=(10, 5))
-    plt.plot(df['tiempo'], df['velocidad'], marker='o', label='Velocidad (km/h)')
-    plt.title('Velocidad Estimada en el tiempo')
-    plt.xlabel('Tiempo')
-    plt.ylabel('Velocidad (km/h)')
-    plt.xticks(rotation=45)
-    plt.legend()
-    plt.grid()
-    plt.tight_layout()
-    plt.show()
-
-if __name__ == "__main__":
-    archivo_json = "index.json"
-    datos = cargar_datos_json(archivo_json)
-    df = procesar_datos(datos)
-    graficar_datos(df)
 
