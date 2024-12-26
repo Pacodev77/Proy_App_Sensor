@@ -1,4 +1,15 @@
-[
-    {"tiempo": "2023-01-01T00:00:00Z", "nivel_combustible": 75, "distancia_recorrida": 10, "velocidad": 60, "orientacion": 180, "coordenadas": {"lat": 10.0, "lon": -74.0}},
-    {"tiempo": "2023-01-01T00:01:00Z", "nivel_combustible": 70, "distancia_recorrida": 20, "velocidad": 65, "orientacion": 185, "coordenadas": {"lat": 10.1, "lon": -74.1}}
-]
+{
+    "sensores": [
+        {"id": 1, "tipo": "nivel_combustible", "valores": [45, 50, 48, 46, 47]},
+        {"id": 2, "tipo": "distancia_recorrida", "valores": [100, 150, 200, 250, 300]},
+        {"id": 3, "tipo": "velocidad", "valores": [60, 65, 62, 70, 68]},
+        {"id": 4, "tipo": "orientacion", "valores": [180, 182, 185, 190, 195]},
+        {"id": 5, "tipo": "coordenadas", "valores": [
+            {"lat": 20.67, "lon": -103.35},
+            {"lat": 20.68, "lon": -103.36},
+            {"lat": 20.69, "lon": -103.37},
+            {"lat": 20.70, "lon": -103.38},
+            {"lat": 20.71, "lon": -103.39}
+        ]}
+    ]
+}
